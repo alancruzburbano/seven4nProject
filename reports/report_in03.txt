@@ -1,0 +1,5 @@
+== Deliveries Report ==
+delivery failed, drone out of coverage area, restarting position
+(-1, -1) direction West
+(-4, -2) direction North
+drone empty, go for more lunches to restaurant
