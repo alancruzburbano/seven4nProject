@@ -1,6 +1,6 @@
 # S4N Application
 
-Single solution for application restaurant using command design pattern and threads.
+Single solution for application restaurant using command design pattern and threads, the explanation is in video inside the folder 'video'
 
 ## Installation
 
