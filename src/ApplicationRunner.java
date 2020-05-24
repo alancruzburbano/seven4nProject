@@ -1,3 +1,4 @@
+
 import models.*;
 import utils.ReadProperties;
 
@@ -18,27 +19,13 @@ public class ApplicationRunner {
 
         propertiesReader = new ReadProperties();
         propertiesReader.initProperties();
-        Integer dronesAvailable = readNumericalValueByKey("drones-available");
-        Integer droneCapacity = readNumericalValueByKey("drone-capacity");
-        ExecutorService deliveryExecutorService = Executors.newFixedThreadPool(dronesAvailable);
+        ExecutorService deliveryExecutorService =
+                Executors.newFixedThreadPool(readNumericalValueByKey("drones-available"));
         try {
             List<Path> orders = Files.list(Paths.get("input/"))
                     .filter(f -> f.toString().toLowerCase().endsWith(".txt"))
                     .collect(Collectors.toList());
-
-            for (int i = 0; i < orders.size(); i++) {
-                if (i <= dronesAvailable) {
-                    Order order = new Order(orders.get(i));
-                    Drone drone = new Drone(droneCapacity);
-                    Deliverable deliver = new Deliver(order, drone);
-                    Runnable ordersDelivery = new OrderManager(deliver);
-                    deliveryExecutorService.execute(ordersDelivery);
-                } else {
-                    System.out.println("all the drones are busy..");
-                    i = orders.size() - 1;
-                }
-            }
-            deliveryExecutorService.shutdown();
+            initializeMaganerOperation(orders, deliveryExecutorService);
             System.out.println("Orders processed");
 
         } catch (IOException e) {
@@ -47,9 +34,27 @@ public class ApplicationRunner {
 
     }
 
+    private static void initializeMaganerOperation(List<Path> orders,
+                                                   ExecutorService deliveryExecutorService){
+        for (int i = 0; i < orders.size(); i++) {
+            if (i <= readNumericalValueByKey("drones-available")) {
+                Order order = new Order(orders.get(i));
+                Drone drone = new Drone(readNumericalValueByKey("drone-capacity"));
+                Deliverable deliver = new Deliver(order, drone);
+                Runnable ordersDelivery = new OrderManager(deliver);
+                deliveryExecutorService.execute(ordersDelivery);
+            } else {
+                System.out.println("all the drones are busy..");
+                i = orders.size() - 1;
+            }
+        }
+        deliveryExecutorService.shutdown();
+    }
+
     public static int readNumericalValueByKey(String key) {
         return Integer.valueOf(propertiesReader
-                .readPropertieByKey(key));
+                .readPropertyByKey(key));
     }
+
 
 }
